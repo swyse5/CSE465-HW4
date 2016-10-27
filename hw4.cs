@@ -156,7 +156,7 @@ class Program
             writeText3.Write(entry);
             writeText3.Write(" ");
 
-          } else if(entry.Length == 2) {
+          } else if(entry.Length == 2 && !CityStates2.Contains(entry)) {
             CityStates2.Add(entry);
           }
         }
