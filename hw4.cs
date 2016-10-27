@@ -1,17 +1,22 @@
 // Stuart Wyse
 // CSE 465 - HW4
 
-// ----------------------------------------------------------
-// CommonCityNames.txt
-
 using System.IO;
 using System;
 using System.Collections.Generic;
 
 class Program
 {
-  static void Main()
-  {
+  static void Main() {
+    CommonCityNames();
+    LatLon();
+    CityStates();
+  }
+
+  //-------------------------------------------------------
+  // CommonCityNames.txt
+
+  static void CommonCityNames() {
     string line;
     System.IO.StreamReader file = new System.IO.StreamReader("states.txt");
 
@@ -46,10 +51,12 @@ class Program
 
       file.Close();
       zipcodes.Close();
+    }
 
-// ---------------------------------------------------------
-// LatLon.txt
+    // --------------------------------------------------
+    // LatLon.txt
 
+    static void LatLon() {
       string line2;
       System.IO.StreamReader file2 = new System.IO.StreamReader("zips.txt");
 
@@ -66,8 +73,8 @@ class Program
 
       // add zip, lat, and lon to LatLon list
       // use zip to make sure no duplicates are added
-      while((line = zipcodes2.ReadLine()) != null) {
-        string[] words2 = line.Split('\t');
+      while((line2 = zipcodes2.ReadLine()) != null) {
+        string[] words2 = line2.Split('\t');
         foreach(string zip in zips) {
           if(words2[1] == zip && !LatLon.Contains(words2[1])) {
             LatLon.Add(words2[1]);
@@ -95,5 +102,72 @@ class Program
       }
       file2.Close();
       zipcodes2.Close();
+    }
+
+    // ----------------------------------------------------
+    // CityStates.txt
+
+    static void CityStates() {
+      string line3;
+      System.IO.StreamReader file3 = new System.IO.StreamReader("cities.txt");
+
+      // List to hold cities in cities.txt
+      List<string> cities = new List<string>();
+
+      // add cities to cities list
+      while((line3 = file3.ReadLine()) != null) {
+        cities.Add(line3);
+      }
+
+      System.IO.StreamReader zipcodes3 = new System.IO.StreamReader("zipcodes.txt");
+      List<string> CityStates = new List<string>();
+
+      // for each city, check each line of zipcodes for matching city
+      // if city matches, add it to CityStates
+      foreach(string city in cities) {
+        // move to beginning of zipcodes.txt for each city
+        zipcodes3.DiscardBufferedData();
+        zipcodes3.BaseStream.Seek(0, System.IO.SeekOrigin.Begin);
+
+        CityStates.Add("\n");
+        CityStates.Add(city);
+        while((line3 = zipcodes3.ReadLine()) != null) {
+          string[] words3 = line3.Split('\t');
+          // add states to CityStates list if they have the given city
+          if(words3[3] == city.ToUpper()) {
+            CityStates.Add(words3[4]);
+          }
+        }
+      }
+
+      List<string> CityStates2 = new List<string>();
+
+      using (StreamWriter writeText3 = new StreamWriter("CityStates.txt")) {
+
+        foreach(string entry in CityStates) {
+          // if entry is the name of the city
+          if(entry.Length != 2) {
+            CityStates2.Sort();
+            foreach(string cityState in CityStates2) {
+              writeText3.Write(cityState + " ");
+            }
+            // clear the list for the next city
+            CityStates2.Clear();
+            writeText3.Write(entry);
+            writeText3.Write(" ");
+
+          } else if(entry.Length == 2) {
+            CityStates2.Add(entry);
+          }
+        }
+        // at end of CityStates, sort and write CityStates2
+        CityStates2.Sort();
+        foreach(string cityState in CityStates2) {
+          writeText3.Write(cityState + " ");
+        }
+
+      }
+      file3.Close();
+      zipcodes3.Close();
     }
   }
